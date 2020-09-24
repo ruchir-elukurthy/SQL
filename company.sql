@@ -132,4 +132,60 @@ SELECT * FROM employee;
 SELECT * FROM client;
 SELECT * FROM employee ORDER BY SALARY DESC;
 SELECT * FROM employee 
+SELECT * FROM employee ORDER BY sex, first_name, last_name;
+SELECT * FROM employee LIMIT 5;
+SELECT first_name, last_name FROM employee;
+SELECT first_name as fore_name, last_name AS sur_name from employee;
+SELECT DISTINCT sex FROM employee;
+SELECT COUNT(emp_id) FROM employee;
+SELECT COUNT(emp_id) FROM employee WHERE sex ='F' AND birth_day > '1970-01-01';
+SELECT * FROM employee;
+SELECT SUM(salary) FROM employee WHERE sex='M';
+SELECT COUNT(sex),sex from employee GROUP BY sex;
+SELECT SUM(total_sales), client_id FROM works_with GROUP BY client_id; 
+-- wildcards
+SELECT * FROM client WHERE client_name LIKE '%LLC';
+SELECT * FROM branch_supplier;
+SELECT * FROM branch_supplier WHERE supplier_name LIKE '%Labels%';
+SELECT * FROM employee WHERE birth_day LIKE '%-10-%';
+SELECT first_name from employee UNION SELECT branch_name from branch;
+SELECT client_name from client union select supplier_name from branch_supplier;
+INSERT INTO branch VALUES(4,'Buffalo',NULL,NULL);
+SELECT * FROM branch;
+SELECT employee.emp_id, employee.first_name, branch.branch_name from employee JOIN branch ON employee.emp_id = branch.mgr_id;
 
+SELECT first_name, last_name FROM employee WHERE emp_id IN (
+SELECT works_with.emp_id from works_with WHERE total_sales > 30000 );
+SELECT client.client_name FROM client WHERE branch_id = (
+SELECT branch_id from branch WHERE mgr_id = 102 LIMIT 1);
+
+-- deleting
+DELETE from employee Where emp_id =102;
+SELECT * FROM branch;
+DELETE FROM branch WHERE branch_id = 2;
+SELECT * FROM branch_supplier;
+
+CREATE TABLE trigger_test (
+	message VARCHAR(100)
+);
+
+DELIMITER $$ 
+CREATE 
+TRIGGER my_trigger BEFORE INSERT 
+ON employee FOR EACH ROW BEGIN 
+INSERT INTO trigger_test VALUES('added new employee'); 
+END$$ DELIMITER ;
+
+INSERT INTO employee VALUES(109,'Oscar','Martinez','1968-02-22','M','90000',106,3);
+SELECT * FROM trigger_test;
+
+DELIMITER $$ CREATE TRIGEER my_trigger1 BEFORE INSERT ON employee FOR EACH ROW BEGIN INSERT INTO trigger_test VALUES(NEW.first_name); END$$ 
+DELIMITER ;
+INSERT INTO employee VALUES(110,'Kevin','Malone','1978-03-30','M',45678,106,3);
+INSERT INTO employee VALUES(112,'Kevin','Malonne','1978-03-20','M',45678,106,3);
+DELIMITER $$ CREATE TRIGEER my_trigger3 BEFORE INSERT ON employee FOR EACH ROW BEGIN INSERT INTO trigger_test VALUES(NEW.first_name); END$$ 
+DELIMITER ;
+INSERT INTO employee VALUES(113,'Kevinn','Malonne','1978-03-20','M',45678,106,3);
+DELIMITER $$ CREATE TRIGEER my_trigger3 BEFORE INSERT ON employee FOR EACH ROW BEGIN INSERT INTO trigger_test VALUES(NEW.first_name); END$$ 
+DELIMITER ;
+INSERT INTO employee VALUES(116,'Kevinn','Malovnne','1978-03-20','M',4578,104,3);
